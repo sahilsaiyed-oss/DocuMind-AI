@@ -1,0 +1,27 @@
+📂 Set 1: HR & Employee Policies ("employee_hr")
+In sawalo se pata chalega ki AI company ke rules kitni achi tarah samajhta hai.
+Explain the company's code of conduct regarding professional ethics "employee_hr"
+What are the different types of leaves an employee can take according to the policy? "employee_hr"
+Summarize the Work from Home (WFH) policy and its requirements "employee_hr"
+What is the procedure for reporting a grievance in the workplace? "employee_hr"
+List the disciplinary actions mentioned in the employee handbook "employee_hr"
+What are the rules regarding office timings and attendance? "employee_hr"
+Explain the sick leave policy and the requirement for a medical certificate "employee_hr"
+What is the notice period for resignation mentioned in the manual? "employee_hr"
+How does the company handle harassment or discrimination complaints? "employee_hr"
+
+
+
+What are the guidelines for maintaining data privacy and confidentiality? "employee_hr"
+🩺 Set 2: Diabetes & Medical Data ("diabetes_pro")
+In sawalo se check hoga ki AI complex medical numbers aur prediction logic sahi pakad raha hai ya nahi.
+What are the specific clinical diagnostic values for diagnosing Type 2 Diabetes? "diabetes_pro"
+List the primary risk factors used to predict the onset of diabetes in adults "diabetes_pro"
+What are the lifestyle modifications recommended for pre-diabetic patients? "diabetes_pro"
+Explain the complications of untreated gestational diabetes for both mother and child "diabetes_pro"
+What is the role of HbA1c levels in monitoring long-term diabetes management? "diabetes_pro"
+List the contraindications for Metformin according to the clinical guidelines "diabetes_pro"
+How does obesity impact the prediction of diabetes in young adults? "diabetes_pro"
+What are the symptoms and immediate treatment for hypoglycemia? "diabetes_pro"
+Explain the difference between Impaired Fasting Glucose (IFG) and Impaired Glucose Tolerance (IGT) "diabetes_pro"
+How often should a diabetic patient get their eyes and kidneys screened? "diabetes_pro"

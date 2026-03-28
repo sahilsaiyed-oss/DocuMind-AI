@@ -2,6 +2,8 @@
 Text chunking module.
 Splits large documents into smaller overlapping chunks for embedding.
 """
+
+'''
 import uuid
 from typing import List
 import tiktoken
@@ -115,4 +117,31 @@ def chunk_text(
         chunk.total_chunks = total
 
     logger.info("text_chunked", filename=filename, chunks=total)
-    return chunks
+    return chunks'''
+
+from typing import List
+import uuid
+from app.models.schemas import DocumentChunk
+
+def chunk_text(text: str, document_id: str, filename: str, source_type: str, category: str = "general") -> List[DocumentChunk]:
+    """Tukde karo aur har tukde pe 'category' ka thappa lagao"""
+    # 1000 characters ka ek tukda
+    chunk_size = 1000
+    chunks = [text[i:i + chunk_size] for i in range(0, len(text), chunk_size)]
+    
+    document_chunks = []
+    for i, content in enumerate(chunks):
+        chunk_obj = DocumentChunk(
+            chunk_id=str(uuid.uuid4()),
+            document_id=document_id,
+            content=content,
+            # BOSS: Yaha metadata mein category add karna sabse zaroori hai!
+            metadata={"category": category}, 
+            filename=filename,
+            source_type=source_type,
+            chunk_index=i,
+            total_chunks=len(chunks)
+        )
+        document_chunks.append(chunk_obj)
+    
+    return document_chunks

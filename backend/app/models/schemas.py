@@ -1,3 +1,4 @@
+'''
 """
 Core data models for the RAG Knowledge Base Agent.
 All data structures are defined here for consistency across modules.
@@ -50,4 +51,49 @@ class QueryResponse(BaseModel):
     sources: list[dict]
     retrieval_score: float
     latency_ms: int
+    session_id: Optional[str] = None'''
+
+from typing import List, Optional, Dict, Any
+from pydantic import BaseModel, Field
+from datetime import datetime
+
+# --- EXISTING MODELS (DO NOT REMOVE) ---
+class DocumentChunk(BaseModel):
+    chunk_id: str
+    document_id: str
+    content: str
+    metadata: Dict[str, Any]
+    filename: str
+    source_type: str  # "file" or "url"
+    source_url: Optional[str] = None
+    chunk_index: int
+    total_chunks: int
+
+class IngestResponse(BaseModel):
+    document_id: str
+    filename: str
+    chunks_created: int
+    status: str
+    ingested_at: str
+
+class QueryResponse(BaseModel):
+    answer: str
+    sources: List[Dict[str, Any]]
+    retrieval_score: float
+    latency_ms: int
+    session_id: str
+
+# --- UPDATED MODELS WITH NEW FEATURES ---
+
+class IngestRequest(BaseModel):
+    url: Optional[str] = None
+    # Default 'general' taaki purana code na toote
+    category: str = Field(default="general", description="Category for the document")
+
+class QueryRequest(BaseModel):
+    query: str
+    top_k: int = Field(default=3)
     session_id: Optional[str] = None
+    # NEW: Response modes and Filtering
+    response_mode: Optional[str] = Field(default="normal", description="normal, short, bullets, detailed")
+    filter_category: Optional[str] = Field(default=None, description="Filter by category tag")

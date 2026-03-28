@@ -1,3 +1,5 @@
+'''
+
 """
 Main ingestion pipeline.
 Orchestrates: load → chunk → embed → store (Pinecone + Supabase).
@@ -105,4 +107,64 @@ if __name__ == "__main__":
     print(f"  Document ID : {result.document_id}")
     print(f"  Filename    : {result.filename}")
     print(f"  Chunks      : {result.chunks_created}")
-    print(f"  Status      : {result.status}")
+    print(f"  Status      : {result.status}")'''
+
+
+
+import os
+import uuid
+import structlog
+from app.ingestion.loaders import load_url, load_file
+from app.ingestion.chunker import chunk_text
+from app.ingestion.embedder import embed_and_store
+
+logger = structlog.get_logger()
+
+def ingest_document(source_type: str, source_path: str, category: str = "general") -> dict:
+    """ASLI LOGIC: Ingests and returns both ID and Chunk count"""
+    doc_id = str(uuid.uuid4())
+    # Safai: Category se extra space hatao
+    clean_cat = category.strip()
+    
+    logger.info("ingestion_started", document_id=doc_id, source=source_path, category=clean_cat)
+
+    try:
+        # 1. Load data
+        if source_type == "url":
+            text = load_url(source_path)
+        else:
+            text = load_file(source_path)
+
+        # 2. Chunking (Category pass karna zaroori hai)
+        chunks = chunk_text(text, doc_id, source_path, source_type, clean_cat)
+        
+        # 3. Embedding and Storage
+        count = embed_and_store(chunks)
+        
+        logger.info("ingestion_complete", chunks=count, document_id=doc_id)
+        return {"document_id": doc_id, "chunks_count": count}
+        
+    except Exception as e:
+        logger.error("ingestion_failed", error=str(e))
+        raise e
+
+def ingest_folder(folder_path: str, category: str = "general") -> dict:
+    """Poore folder ko ingest karne ka power"""
+    clean_path = folder_path.strip().strip('"').strip("'")
+    if not os.path.exists(clean_path):
+        return {"error": f"Path nahi mila: {clean_path}"}
+
+    files = [f for f in os.listdir(clean_path) if f.endswith(('.pdf', '.docx', '.txt'))]
+    results = []
+    total_chunks = 0
+
+    for filename in files:
+        file_path = os.path.join(clean_path, filename)
+        try:
+            res = ingest_document("file", file_path, category)
+            total_chunks += res["chunks_count"]
+            results.append({"file": filename, "status": "success", "chunks": res["chunks_count"]})
+        except Exception as e:
+            results.append({"file": filename, "status": "failed", "error": str(e)})
+
+    return {"total_files": len(files), "total_chunks_created": total_chunks, "details": results}

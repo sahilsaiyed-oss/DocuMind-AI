@@ -1,3 +1,4 @@
+'''
 """
 Document loaders for PDF, DOCX, TXT, and URL sources.
 Each loader returns raw text for the chunker to process.
@@ -131,4 +132,71 @@ def load_document(source: str) -> Tuple[str, str, dict]:
         text, meta = load_txt(source)
         return text, "txt", meta
     else:
-        raise ValueError(f"Unsupported file type: {ext}. Supported: pdf, docx, txt, url")
+        raise ValueError(f"Unsupported file type: {ext}. Supported: pdf, docx, txt, url")'''
+
+import os
+import requests
+from bs4 import BeautifulSoup
+import fitz  # PyMuPDF
+import docx2txt
+import structlog
+
+logger = structlog.get_logger()
+
+def load_url(url: str) -> str:
+    """Load text content from a URL"""
+    try:
+        response = requests.get(url, timeout=10)
+        response.raise_for_status()
+        soup = BeautifulSoup(response.text, 'html.parser')
+        
+        # Remove script and style elements
+        for script in soup(["script", "style"]):
+            script.decompose()
+            
+        return soup.get_text(separator=' ', strip=True)
+    except Exception as e:
+        logger.error("url_load_failed", url=url, error=str(e))
+        raise
+
+def load_pdf(file_path: str) -> str:
+    """Extract text from PDF using PyMuPDF (fitz)"""
+    text = ""
+    try:
+        with fitz.open(file_path) as doc:
+            for page in doc:
+                text += page.get_text()
+        return text
+    except Exception as e:
+        logger.error("pdf_load_failed", path=file_path, error=str(e))
+        raise
+
+def load_docx(file_path: str) -> str:
+    """Extract text from DOCX"""
+    try:
+        return docx2txt.process(file_path)
+    except Exception as e:
+        logger.error("docx_load_failed", path=file_path, error=str(e))
+        raise
+
+def load_txt(file_path: str) -> str:
+    """Read TXT file"""
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            return f.read()
+    except Exception as e:
+        logger.error("txt_load_failed", path=file_path, error=str(e))
+        raise
+
+def load_file(file_path: str) -> str:
+    """NEW FEATURE: Generic loader that detects file type"""
+    ext = os.path.splitext(file_path)[1].lower()
+    
+    if ext == '.pdf':
+        return load_pdf(file_path)
+    elif ext == '.docx':
+        return load_docx(file_path)
+    elif ext == '.txt':
+        return load_txt(file_path)
+    else:
+        raise ValueError(f"Unsupported file type: {ext}")

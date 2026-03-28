@@ -1,8 +1,6 @@
+.env
 venv/
 __pycache__/
-*.pyc
-.env
-logs/
-data/
-*.egg-info/
-.DS_Store
+node_modules/
+chroma_db/
+*.log
