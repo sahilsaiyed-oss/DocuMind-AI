@@ -1,3 +1,3 @@
-# Welcome to your Lovable project
+# Welcome to DocuMind AI project
 
 TODO: Document your project here
